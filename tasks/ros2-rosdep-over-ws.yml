@@ -1,0 +1,19 @@
+---
+# fetch package-specific system dependencies
+
+# update rosdep package lists
+- name: rosdep install system dependencies
+  ansible.builtin.shell: 'DEBIAN_FRONTEND=noninteractive rosdep update'
+  args:
+    executable: /bin/bash
+    chdir: '{{ ros2_workspace }}'
+
+# use rosdep to download package dependencies
+- name: rosdep install system dependencies
+  ansible.builtin.shell: 'DEBIAN_FRONTEND=noninteractive rosdep install --from-paths src/ --ignore-src -r -y'
+  args:
+    executable: /bin/bash
+    chdir: '{{ ros2_workspace }}'
+
+
+

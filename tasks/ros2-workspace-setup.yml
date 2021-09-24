@@ -1,0 +1,16 @@
+---
+
+
+# creates a workspace 
+
+
+- name: Create a ROS2 workspace
+  file:
+    dest: {{ ros2_workspace }}/src/{{ item }}
+    state: directory
+    owner: {{ ros2_user.name }}
+    group: {{ ros2_user.group }}
+  loop: {{ ws_dirs }}
+
+
+

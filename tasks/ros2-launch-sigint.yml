@@ -1,0 +1,13 @@
+
+
+
+
+
+
+
+    test running:
+      ??
+      pgrep -f 'ros2 launch claw claw.launch.py'
+    stop launched:
+    
+      pkill --signal INT -f 'ros2 launch claw claw.launch.py'

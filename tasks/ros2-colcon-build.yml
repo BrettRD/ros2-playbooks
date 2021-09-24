@@ -1,0 +1,9 @@
+---
+# build with colcon using defaults set previously
+# XXXdefaults should include --symlink-install
+
+- name: Build the workspace with colon
+  ansible.builtin.shell: colcon build 
+  args:
+    executable: /bin/bash
+    chdir: {{ ros2_workspace }}

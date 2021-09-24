@@ -1,0 +1,9 @@
+---
+# start a ros2 launch file
+# XXXdefaults should include --symlink-install
+
+- name: start a launchfile
+  ansible.builtin.shell: ros2 launch {{ launchpackage }} {{ launchfile }}
+  args:
+    executable: /bin/bash
+    chdir: {{ ros2_workspace }}

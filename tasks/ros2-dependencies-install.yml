@@ -1,0 +1,38 @@
+---
+
+#############
+# fetch deps
+
+# tools to build ros from source
+- name: ROS2 source build dependencies
+  apt:
+    name: 
+    - build-essential
+    - cmake
+    - git
+    - python3-colcon-common-extensions
+    - python3-flake8
+    - python3-pip
+    - python3-pytest-cov
+    - python3-rosdep
+    - python3-setuptools
+    - python3-vcstool
+    - wget
+
+
+# gstreamer tools and plugins for audio
+- name: Gstreamer minimal install
+  apt:
+    name: 
+    - gstreamer1.0-tools
+    - gstreamer1.0-plugins-base
+    - gstreamer1.0-plugins-good
+    - gstreamer1.0-alsa
+
+
+# tools to enhance developer comfort
+- name: Comfort tools install
+  apt:
+    name: 
+    - screen
+    - python3-argcomplete

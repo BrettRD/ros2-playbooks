@@ -1,0 +1,72 @@
+---
+
+# make sure launch_service_env_dir exists
+- name: ROS2 systemd service from launch | create folder for environment variables
+  file:
+    dest: {{ launch_service_env_dir }}
+    state: directory
+
+
+# extract the environment variables from setup.bash into a systemd environment file
+- name: ROS2 systemd service from launch | read setup.bash into EnvironmentFile
+  ansible.builtin.shell: |
+    source {{ ros2_workspace }}/install/setup.bash
+    env > {{ launch_service_env_dir }}/{{ launch_service_name }}.env
+  #ansible.builtin.shell: |
+  #  mkdir -p /tmp/systemd_from_roslaunch
+  #  env > /tmp/systemd_from_roslaunch/base.env
+  #  . {{ ros2_workspace }}/install/setup.bash
+  #  env > /tmp/systemd_from_roslaunch/ros.env
+  #  diff --changed-group-format='%>' --unchanged-group-format='' /tmp/systemd_from_roslaunch/base.env /tmp/systemd_from_roslaunch/ros.env > {{ service_env_dir }}/{{ launch_service_name }}.env
+  #  rm -r /tmp/systemd_from_roslaunch
+  args:
+    executable: /bin/bash
+    chdir: '{{ ros2_workspace }}'
+
+
+
+# template a new systemd service for just this launch file
+- name: ROS2 systemd service from launch | Create Unit file
+  template:
+    src: ros2-systemd-from-launch.service.j2
+    dest: /usr/lib/systemd/system/ros2_{{ launch_service_name }}.service
+    mode: 644
+
+
+# load the new systemd service, but don't start it
+- name: 
+  ansible.builtin.systemd:
+    name: ros2_{{ launch_service_name }}.service
+    #state: {{ launch_immediately }}
+    #enabled: {{ launch_on_boot }}
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+
+
+
+
+###### thompsons service ##############
+#[Unit]
+#Description=ROS2 launch
+#After=network.target
+#
+#[Service]
+#ExecStart=bash ros2launcher.sh
+#WorkingDirectory=/home/pi/startup
+#StandardOutput=inherit
+#StandardError=inherit
+#Restart=no
+#User=pi
+#
+#[Install]
+#WantedBy=multi-user.target
+##################
+
+
+
+########## ros2launcher.sh ####################
+##!/bin/bash
+#. /home/pi/ros2_ws/install/setup.bash
+#ros2 launch thompsons esc_diff_drive.launch.py
+####################
