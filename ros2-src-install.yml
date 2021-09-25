@@ -18,38 +18,46 @@
     ansible.builtin.include_vars:
       file: vars/workspace-config.yml
 
-  - name: debug messages
+  - name: report the config back
     ansible.builtin.debug:
       msg: 
         - 'Installing ROS2 {{ ros2_distribution }}'
-        - 'for {{ ros2_user.name }}'
+        - 'for user: {{ ros2_user.name }}'
         - 'into workspace at {{ ros2_workspace }}'
-        - 'preloading directories with config {{ ros2_workspace_layout }}'
+        #- 'preloading directories with config {{ ros2_workspace_layout }}'
 
+
+  ############## start changing the target #################
 
   # add the ros apt key, this is needed for ros DDS packages
-  #- name: add ros2 sources
-  #  include: tasks/ros2-add-apt-sources.yml
+  - name: add ros2 sources
+    include: tasks/ros2-add-apt-sources.yml
 
   # apt install some bits to get started
-  #- name: add ros2-dependencies
-  #  include: tasks/ros2-dependencies-install.yml
+  - name: add ros2-dependencies
+    include: tasks/ros2-dependencies-install.yml
 
   # create and fill a workspace
-  #- name: ROS2 Workspace Setup
-  #  include: tasks/ros2-workspace-setup.yml
+  - name: ROS2 Workspace Setup
+    include: tasks/ros2-workspace-setup.yml
 
   # fetch package-specific system dependencies
-  #- name: ROS2 install remaining packages with rosdep
-  #  include: tasks/ros2-rosdep-over-ws.yml
-
   - name: ROS2 install remaining packages with rosdep
-    include: tasks/ros2-systemd-from-launch.yml
-    vars:
-      launch_service_name: hypothetical_service
-      launchpackage: ros2_postulates
-      launchfile: just_a_theory.launch.py
+    include: tasks/ros2-rosdep-over-ws.yml
 
-  # finally build the workspace
-  #- name: ROS2 rosdep over workspace
-  #  include: tasks/ros2-colcon-build.yml
+
+  # set some sane defaults for prototyping with colcon
+  # use symlink for fiddling configs over git
+  # avoid symlink for cloning binaries
+  - name: set some colcon default flags
+    include: tasks/ros2-colcon-set-defaults.yml
+    vars:
+      ros2_colcon_symlink: true
+      ros2_colcon_needs_latomic: false
+
+  # XXX check the system ram and allocate temporary swap
+
+  # # finally build the workspace
+  - name: ROS2 colcon | build the workspace
+    include: tasks/ros2-colcon-build.yml
+

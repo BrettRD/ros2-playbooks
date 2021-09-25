@@ -1,0 +1,35 @@
+---
+- hosts: just_effie
+  vars:
+    ros2_user:
+      name: '{{ ansible_user }}'
+      group: '{{ ansible_user }}'
+    ros2_workspace: '/home/{{ ros2_user.name }}/{{ ros2_distribution }}_ws/'
+
+
+
+  tasks:
+
+  - name: lookup desired ros config
+    ansible.builtin.include_vars:
+      file: vars/ros-config.yml
+
+  - name: lookup desired workspace layout
+    ansible.builtin.include_vars:
+      file: vars/workspace-config.yml
+
+  - name: report the config back
+    ansible.builtin.debug:
+      msg: 
+        - 'Managing ROS2 {{ ros2_distribution }}'
+        - 'For user: {{ ros2_user.name }}'
+        - 'In workspace at {{ ros2_workspace }}'
+
+
+  ############## start changing the target #################
+
+  - name: ROS2 install a launch file as a systemd service
+    include: tasks/ros2-systemd-from-launch.yml
+    when: ((remove|bool) and (launch_service_name is defined)) or (launch_service_name is defined and launchpackage is defined and launchfile is defined)
+
+

@@ -1,16 +1,28 @@
 ---
 
 # XXX Set --symlink-install and check if -libatomic is needed for CMake
+- name: ROS2 create the default colcon config directory
+  ansible.builtin.file:
+    dest: /home/{{ ros2_user.name }}/.colcon/
+    state: directory
+
 
 
 - name: ROS2 Colcon create a defaults.yaml
   copy:
-    dest: '~/.colcon/defaults.yaml'
+    dest: '/home/{{ ros2_user.name }}/.colcon/defaults.yaml'
     content: |
       {
-          "build": {
-              "symlink-install": true
-              "cmake-args":[ "-DCMAKE_SHARED_LINKER_FLAGS='-latomic'","-DCMAKE_EXE_LINKER_FLAGS='-latomic'" ]
-          }
+        "build": {
+      {% if ros2_colcon_symlink %}
+          "symlink-install": true,
+      {% endif %}
+      {% if ros2_colcon_needs_latomic %}
+          "cmake-args":[ "-DCMAKE_SHARED_LINKER_FLAGS='-latomic'","-DCMAKE_EXE_LINKER_FLAGS='-latomic'" ],
+      {% endif %}
+        }
       }
+    force: true
+
+
 

@@ -1,20 +1,8 @@
 ---
 
-# template a new systemd service for just this launch file
-# uses {{ launchpackage }} and {{ launchfile }}
-# - name: ROS2 systemd service from launch | Create Unit file
-#   template:
-#     src: ros2-systemd-from-launch.service.j2
-#     dest: /usr/lib/systemd/system/ros2_{{ launch_service_name }}.service
-#     mode: 644
-#   become: yes
-
-
-
 - name: ROS2 systemd service from launch | Create Unit file
   copy:
-    # dest: /usr/lib/systemd/system/ros2_{{ launch_service_name }}.service
-    dest: '{{ ros2_workspace }}/ros2_{{ launch_service_name }}.service'
+    dest: /usr/lib/systemd/system/ros2_{{ launch_service_name }}.service
     content: |
       # Created by ansible ros2-systemd-from-launch
       # ROS2 launch service {{ launch_service_name }}
@@ -35,27 +23,27 @@
       [Install]
       WantedBy=multi-user.target
   become: yes
-  when: remove is false or remove is undefined
-
+  when: (remove is undefined or not remove|bool) and (launch_service_name is defined and launchpackage is defined and launchfile is defined)
 
 
 # # load the new systemd service, but don't start it
 # - name: ROS2 systemd service from launch | Insert Unit file
 #   ansible.builtin.systemd:
 #     name: ros2_{{ launch_service_name }}.service
-#     #state: {{ launch_immediately }} # running
-#     #enabled: {{ launch_on_boot }} # yes
+#     #state: {{ remove == false && launch_immediately == true }} # running
+#     #enabled: {{  remove == false && launch_on_boot }} # yes
 #     state: stopped
 #     enabled: no
 #     daemon_reload: yes
 #   become: yes
 
 
-
-- name: Remove launch service
+- name: ROS2 systemd service from launch | Remove launch service
   ansible.builtin.file:
-    # dest: /usr/lib/systemd/system/ros2_{{ launch_service_name }}.service
-    dest: '{{ ros2_workspace }}/ros2_{{ launch_service_name }}.service'
+    dest: /usr/lib/systemd/system/ros2_{{ launch_service_name }}.service
     state: absent
   become: yes
-  when: remove is true
+  when: (remove|bool) and (launch_service_name is defined)
+
+
+
