@@ -1,9 +1,11 @@
 ---
 # start a ros2 launch file
-# XXXdefaults should include --symlink-install
+
+# This deliberately runs in foreground.
+# If you need to launch to background, use ros2-systemd-from-launch.yml
 
 - name: start a launchfile
-  ansible.builtin.shell: ros2 launch {{ launchpackage }} {{ launchfile }}
+  shell: source install/setup.bash && ros2 launch {{ launchpackage }} {{ launchfile }}
   args:
     executable: /bin/bash
-    chdir: {{ ros2_workspace }}
+    chdir: '{{ ros2_workspace }}'

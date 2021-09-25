@@ -1,16 +1,36 @@
 ---
 
 
-# creates a workspace 
 
-
-- name: Create a ROS2 workspace
-  file:
-    dest: {{ ros2_workspace }}/src/{{ item }}
+# create subdirectories
+- name: Create ROS2 workspace subdirectory {{ source_subset.target_ws_dir }}
+  ansible.builtin.file:
+    dest: '{{ ros2_workspace }}/src/{{ source_subset.target_ws_dir }}'
     state: directory
-    owner: {{ ros2_user.name }}
-    group: {{ ros2_user.group }}
-  loop: {{ ws_dirs }}
+    owner: '{{ ros2_user.name }}'
+    group: '{{ ros2_user.group }}'
+  loop: '{{ ros2_workspace_layout }}'
+  loop_control:
+    loop_var: source_subset
 
+#source packages from vcs
+- name: ROS2 generator list and download sources into {{ source_subset.target_ws_dir }}
+  include: ros2-source-vcs.yml
+  vars:
+    ros_packages: '{{ source_subset.ros_packages }}'
+    target_ws_dir: '{{ source_subset.target_ws_dir }}'
+  when: source_subset.ros_packages is defined and source_subset.ros_packages|length
+  loop: '{{ ros2_workspace_layout }}'
+  loop_control:
+    loop_var: source_subset
 
-
+#source packages from git
+- name: ROS2 git clone sources into {{ source_subset.target_ws_dir }}
+  include: ros2-source-git.yml
+  vars:
+    repo_list: '{{ source_subset.git_repos }}'
+    target_ws_dir: '{{ source_subset.target_ws_dir }}'
+  when: source_subset.git_repos is defined and source_subset.git_repos|length
+  loop: '{{ ros2_workspace_layout }}'
+  loop_control:
+    loop_var: source_subset

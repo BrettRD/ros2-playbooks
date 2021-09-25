@@ -1,0 +1,21 @@
+
+# Created by ansible ros2-systemd-from-launchfile
+# ROS2 launch service "{{ launch_service_name }}"
+# ros2 workspace: "{{ ros2_workspace }}"
+# package containing launch file: "{{ launchpackage }}"
+# launchfile name: "{{ launchfile }}"
+
+[Unit]
+Description=ROS2 launch {{ launchpackage }} {{ launchfile }}
+After=network.target
+
+[Service]
+ExecStart=/bin/bash -c source install/setup.bash && ros2 launch {{ launchpackage }} {{ launchfile }}
+WorkingDirectory={{ ros2_workspace }}
+StandardOutput=inherit
+StandardError=inherit
+Restart=no
+User={{ ros2_user.name }}
+
+[Install]
+WantedBy=multi-user.target

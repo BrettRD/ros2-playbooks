@@ -1,0 +1,8 @@
+---
+- name: Remove build artefacts from a ROS2 workspace
+  ansible.builtin.file:
+    dest: '{{ ros2_workspace }}/{{ item }}'
+    state: absent
+  loop: [ install, build, log ]
+
+

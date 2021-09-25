@@ -1,0 +1,37 @@
+---
+# sudo apt update && sudo apt install curl gnupg2 lsb-release
+- name: Install dependencies for setting up sources
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg2
+      - lsb-release
+      - python3-apt   # ansible.builtin.apt_repository would try to install this later
+    update_cache: yes
+  become: yes
+
+
+# curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+- name: Setup ROS2 keys
+  ansible.builtin.apt_key:
+    url: '{{ ros2_gpg_key_url }}'
+    state: present
+  become: yes
+
+# echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+- name: Setup ROS2 sources
+  ansible.builtin.apt_repository:
+    repo: deb {{ ros2_repository_url }} {{ ansible_distribution_release }} main
+    state: present
+    filename: ros2-latest
+  become: yes
+
+- name: Update apt cache with new sources
+  ansible.builtin.apt:
+    update_cache: yes
+  become: yes
+
+
+
+
+

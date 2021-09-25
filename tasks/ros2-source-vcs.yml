@@ -9,20 +9,21 @@
 # This unfortunately requires us to both list and download on each step
 
 # use rosinstall_generator to list packages to download
-- name: rosinstall_generator create a list of source locations for ros packages
-  ansible.builtin.shell: 'rosinstall_generator {{ packages }} --rosdistro {{ ros2_distribution }} --deps --exclude-path src > {{ vcs_name }}.repos'
-  args:
-    executable: /bin/bash
-    chdir: {{ ros2_workspace }}
-    #creates: {{ vcs_name }}.repos  # allow update
-
-
-# use vcs_tool to download packages
-- name: vcs_tool download the sources listed by rosinstall_generator
-  ansible.builtin.shell: 'vcs-import src/{{ target_ws_dir }} < {{ vcs_name }}.repos'
+- name: ROS2 list sources using rosinstall_generator
+  shell: 'rosinstall_generator {{ ros_packages|join(" ") }} --rosdistro {{ ros2_distribution }} --deps --exclude-path src > {{ target_ws_dir }}.repos'
   args:
     executable: /bin/bash
     chdir: '{{ ros2_workspace }}'
+    creates: '{{ target_ws_dir }}.repos'  # XXX allow update
+  #when: ros_packages is defined and ros_packages is not empty
+
+# use vcs_tool to download packages
+- name: ROS2 download sources with vcs_tool
+  shell: 'vcs-import src/{{ target_ws_dir }} < {{ target_ws_dir }}.repos'
+  args:
+    executable: /bin/bash
+    chdir: '{{ ros2_workspace }}'
+  #when: ros_packages is defined and ros_packages is not empty
 
 
 

@@ -3,36 +3,47 @@
 #############
 # fetch deps
 
+#- name: update apt
+#  ansible.builtin.apt:
+#    update_cache: yes
+#  become: yes
+
+
 # tools to build ros from source
 - name: ROS2 source build dependencies
-  apt:
+  ansible.builtin.apt:
     name: 
     - build-essential
     - cmake
     - git
     - python3-colcon-common-extensions
+    - python3-rosinstall-generator
+    - python3-vcstool
     - python3-flake8
     - python3-pip
     - python3-pytest-cov
     - python3-rosdep
     - python3-setuptools
-    - python3-vcstool
     - wget
+  become: yes
 
+# XXX pick a simpler example application to clone and launch
 
 # gstreamer tools and plugins for audio
 - name: Gstreamer minimal install
-  apt:
+  ansible.builtin.apt:
     name: 
     - gstreamer1.0-tools
     - gstreamer1.0-plugins-base
     - gstreamer1.0-plugins-good
     - gstreamer1.0-alsa
+  become: yes
 
 
 # tools to enhance developer comfort
 - name: Comfort tools install
-  apt:
+  ansible.builtin.apt:
     name: 
     - screen
     - python3-argcomplete
+  become: yes

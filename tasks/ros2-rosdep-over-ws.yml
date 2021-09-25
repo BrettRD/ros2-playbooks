@@ -1,18 +1,22 @@
 ---
 # fetch package-specific system dependencies
 
+# XXX rosdep wants apt to fetch rti-connext-dds-5.3.1
+#     which is not available in the normal repos.
+#     this is what we need the OSRF repos for.
+
 # update rosdep package lists
-- name: rosdep install system dependencies
-  ansible.builtin.shell: 'DEBIAN_FRONTEND=noninteractive rosdep update'
+- name: rosdep update package lists
+  command: rosdep update
+  become: yes
   args:
-    executable: /bin/bash
     chdir: '{{ ros2_workspace }}'
 
 # use rosdep to download package dependencies
 - name: rosdep install system dependencies
-  ansible.builtin.shell: 'DEBIAN_FRONTEND=noninteractive rosdep install --from-paths src/ --ignore-src -r -y'
+  command: rosdep install --from-paths src/ --ignore-src -r -y
+  become: yes
   args:
-    executable: /bin/bash
     chdir: '{{ ros2_workspace }}'
 
 

@@ -1,0 +1,16 @@
+---
+
+# XXX Set --symlink-install and check if -libatomic is needed for CMake
+
+
+- name: ROS2 Colcon create a defaults.yaml
+  copy:
+    dest: '~/.colcon/defaults.yaml'
+    content: |
+      {
+          "build": {
+              "symlink-install": true
+              "cmake-args":[ "-DCMAKE_SHARED_LINKER_FLAGS='-latomic'","-DCMAKE_EXE_LINKER_FLAGS='-latomic'" ]
+          }
+      }
+

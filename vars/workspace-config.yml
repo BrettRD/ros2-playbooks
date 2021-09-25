@@ -1,0 +1,37 @@
+---
+
+
+# automatically prepare a source-only workspace with a mix of vcs and git repos
+# 
+#
+# git repos are placed into folders accoring to:
+#   ws/src/{{ target_ws_dir }}/{{ git_repos[n].dest }}
+#
+# vcs trees are placed under 
+#   ws/src/{{ target_ws_dir }}/< vcs tree goes here>
+#
+# vcs repo names are generated as
+#   {{ target_ws_dir }}.repos
+
+ros2_workspace_layout:
+  - target_ws_dir: core
+    ros_packages:
+      - ros_core
+    git_repos: []
+
+  - target_ws_dir: teleop
+    ros_packages:
+      - joy
+      - sdl2_vendor
+      - joy_linux
+      - diagnostic_updater
+      - teleop_twist_keyboard
+      - teleop_twist_joy
+    git_repos: []
+
+  - target_ws_dir: sound_app
+    ros_packages: []
+    git_repos:
+      - dest: ros-gst-bridge  # allow name override
+        repo: 'https://github.com/BrettRD/ros-gst-bridge.git'
+        # version: HEAD # XXX fiddle with conditionals

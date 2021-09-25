@@ -1,0 +1,55 @@
+---
+- hosts: just_effie
+  vars:
+    ros2_user:
+      name: '{{ ansible_user }}'
+      group: '{{ ansible_user }}'
+    ros2_workspace: '/home/{{ ros2_user.name }}/{{ ros2_distribution }}_ws/'
+
+
+
+  tasks:
+
+  - name: lookup desired ros config
+    ansible.builtin.include_vars:
+      file: vars/ros-config.yml
+
+  - name: lookup desired workspace layout
+    ansible.builtin.include_vars:
+      file: vars/workspace-config.yml
+
+  - name: debug messages
+    ansible.builtin.debug:
+      msg: 
+        - 'Installing ROS2 {{ ros2_distribution }}'
+        - 'for {{ ros2_user.name }}'
+        - 'into workspace at {{ ros2_workspace }}'
+        - 'preloading directories with config {{ ros2_workspace_layout }}'
+
+
+  # add the ros apt key, this is needed for ros DDS packages
+  #- name: add ros2 sources
+  #  include: tasks/ros2-add-apt-sources.yml
+
+  # apt install some bits to get started
+  #- name: add ros2-dependencies
+  #  include: tasks/ros2-dependencies-install.yml
+
+  # create and fill a workspace
+  #- name: ROS2 Workspace Setup
+  #  include: tasks/ros2-workspace-setup.yml
+
+  # fetch package-specific system dependencies
+  #- name: ROS2 install remaining packages with rosdep
+  #  include: tasks/ros2-rosdep-over-ws.yml
+
+  - name: ROS2 install remaining packages with rosdep
+    include: tasks/ros2-systemd-from-launch.yml
+    vars:
+      launch_service_name: hypothetical_service
+      launchpackage: ros2_postulates
+      launchfile: just_a_theory.launch.py
+
+  # finally build the workspace
+  #- name: ROS2 rosdep over workspace
+  #  include: tasks/ros2-colcon-build.yml
