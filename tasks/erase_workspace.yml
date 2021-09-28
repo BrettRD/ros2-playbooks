@@ -1,9 +1,0 @@
----
-
-- name: Remove parts of a ROS2 workspace
-  ansible.builtin.file:
-    dest: '{{ ros2_workspace }}/src/{{ item }}'
-    state: absent
-  loop: '{{ ws_dirs }}'
-
-

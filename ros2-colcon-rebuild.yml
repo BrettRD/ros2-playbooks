@@ -36,22 +36,6 @@
 
   ############## start changing the target #################
 
-  # add the ros apt key, this is needed for ros DDS packages
-  - name: add ros2 sources
-    include: tasks/ros2-add-apt-sources.yml
-
-  # apt install some bits to get started
-  - name: add ros2-dependencies
-    include: tasks/ros2-dependencies-install.yml
-
-  # create and fill a workspace
-  - name: ROS2 Workspace Setup
-    include: tasks/ros2-workspace-setup.yml
-
-  # fetch package-specific system dependencies
-  - name: ROS2 install remaining packages with rosdep
-    include: tasks/ros2-rosdep-over-ws.yml
-
 
   # set some sane defaults for prototyping with colcon
   # use symlink for fiddling configs over git
@@ -64,6 +48,6 @@
 
 
   # # finally build the workspace
-  #- name: ROS2 colcon | build the workspace
-  #  include: tasks/ros2-colcon-build.yml
+  - name: ROS2 colcon | build the workspace
+    include: tasks/ros2-colcon-build.yml
 

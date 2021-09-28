@@ -8,7 +8,6 @@
 # update rosdep package lists
 - name: rosdep update package lists
   command: rosdep update
-  become: yes
   args:
     chdir: '{{ ros2_workspace }}'
 

@@ -17,6 +17,10 @@
       {% if ros2_colcon_symlink %}
           "symlink-install": true,
       {% endif %}
+      {% if ros2_colcon_single_core %}
+          "parallel-workers": 1,
+          "make-flags" :"-j1",
+      {% endif %}
       {% if ros2_colcon_needs_latomic %}
           "cmake-args":[ "-DCMAKE_SHARED_LINKER_FLAGS='-latomic'","-DCMAKE_EXE_LINKER_FLAGS='-latomic'" ],
       {% endif %}

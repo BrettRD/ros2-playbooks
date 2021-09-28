@@ -1,8 +1,35 @@
 ---
 # build with colcon using defaults set previously
-# XXX defaults should include --symlink-install
 
-- name: Build the workspace with colon
-  command: colcon build 
-  args:
-    chdir: '{{ ros2_workspace }}'
+# my sympathies to your SD card
+- name: ROS2 Colcon | add swap space for build
+  include_role:
+    name: geerlingguy.swap
+    tasks_from: enable
+    apply:
+      become: yes
+  vars:
+    #swap_swappiness: 2  # avoid using this swapfile where possible
+    #swap_swappiness: 60  # The swap role used set system-wide swappiness and does not un-set it on swapoff
+    swap_file_path: '{{ ros2_workspace }}/colcon_swapfile'
+    swap_file_size_mb: '4096'
+  when: colcon_use_swap|bool
+
+
+- name:
+  block:
+    - name: ROS2 Colcon | build
+      command: colcon build 
+      args:
+        chdir: '{{ ros2_workspace }}'
+
+  always:
+    - name: ROS2 Colcon | remove swap space
+      include_role:
+        name: geerlingguy.swap
+        tasks_from: disable
+        apply:
+          become: yes
+      vars:
+        swap_file_path: '{{ ros2_workspace }}/colcon_swapfile'
+      when: colcon_use_swap|bool

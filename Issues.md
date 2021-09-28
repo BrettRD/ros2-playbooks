@@ -8,6 +8,5 @@
     consider using a list concatenation of previous vcs packages passed to --deps-up-to instead, with a switch on empty to use --deps
 * workspace location is fixed in the playbook
     needs to use a sane templated default derived from vars
-* set colcon defaults
 
-
+* allow colcon swap undefined

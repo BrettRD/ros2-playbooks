@@ -1,0 +1,15 @@
+---
+
+- name: Remove sources from a ROS2 workspace
+  ansible.builtin.file:
+    dest: '{{ ros2_workspace }}/src/{{ item }}'
+    state: absent
+  loop: '{{ ws_dirs }}'
+
+- name: Remove repos lists from a ROS2 workspace
+  ansible.builtin.file:
+    dest: '{{ ros2_workspace }}/{{ item }}.repos'
+    state: absent
+  loop: '{{ ws_dirs }}'
+
+

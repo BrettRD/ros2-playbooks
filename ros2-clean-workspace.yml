@@ -22,14 +22,23 @@
     ansible.builtin.debug:
       msg: 
         - 'Managing ROS2 {{ ros2_distribution }}'
-        - 'For user: {{ ros2_user.name }}'
-        - 'In workspace at {{ ros2_workspace }}'
+        - 'for user: {{ ros2_user.name }}'
+        - 'in workspace at {{ ros2_workspace }}'
+        #- 'preloading directories with config {{ ros2_workspace_layout }}'
 
 
   ############## start changing the target #################
 
-  - name: ROS2 install a launch file as a systemd service
-    include: tasks/ros2-systemd-from-launch.yml
-    when: ((remove|bool) and (launch_service_name is defined)) or (launch_service_name is defined and launchpackage is defined and launchfile is defined)
+  # XXX offer a way of removing packages from a workspace
+
+  - name: ROS2 remove existing build files
+    include: tasks/ros2-clean-workspace.yml
+    when: (fullclean|bool)
+
+  - name: ROS2 remove sources
+    include: tasks/ros2-erase-workspace.yml
+    when: (remove_sources|bool) and (ws_dirs is defined)
+
+
 
 
