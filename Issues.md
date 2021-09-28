@@ -9,4 +9,11 @@
 * workspace location is fixed in the playbook
     needs to use a sane templated default derived from vars
 
-* allow colcon swap undefined
+* allow colcon swap variable to be undefined
+
+* geerlingguy's swap role skips swapon if it doesn't have to create the file.
+
+
+
+
+
