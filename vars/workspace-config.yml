@@ -14,11 +14,15 @@
 #   {{ target_ws_dir }}.repos
 
 ros2_workspace_layout:
+  # this is needed on 32b arm and unsupported platforms
+  # XXX add an install-from-binary option
   - target_ws_dir: core
     ros_packages:
       - ros_core
     git_repos: []
 
+  # this demonstrates adding native ROS features beyond ros_core
+  # these packages can also normally come from apt except for 32b
   - target_ws_dir: teleop
     ros_packages:
       - joy
@@ -29,9 +33,12 @@ ros2_workspace_layout:
       - teleop_twist_joy
     git_repos: []
 
+  # a placeholder to demonstrate loading your own git repos
   - target_ws_dir: sound_app
     ros_packages: []
     git_repos:
       - dest: ros-gst-bridge  # allow name override
         repo: 'https://github.com/BrettRD/ros-gst-bridge.git'
         # version: HEAD # XXX fiddle with conditionals
+
+  # XXX add support for vcs .repos files

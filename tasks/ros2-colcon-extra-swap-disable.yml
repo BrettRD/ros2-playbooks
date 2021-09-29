@@ -1,0 +1,17 @@
+---
+
+- name: ROS2 swap disable | test if swap is mounted
+  shell: "swapon --show=name,size --bytes | grep {{ swap_file_path }}"
+  register: swap_file_in_use
+  failed_when: swap_file_in_use.rc == 2
+
+- name: ROS2 swap disable | unmount swap
+  command: swapoff {{ swap_file_path }}
+  become: yes
+  when: swap_file_in_use.rc == 0
+
+- name: ROS2 swap disable | delete swap
+  file:
+    path: "{{ swap_file_path }}"
+    state: absent
+  become: yes # the file will be owned by root

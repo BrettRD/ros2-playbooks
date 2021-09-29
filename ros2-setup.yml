@@ -1,19 +1,11 @@
 ---
-
-- name: install role 'swap' from geerlingguy
-  hosts: localhost
-  tasks:
-    - name: Get geerlingguy.swap
-      command: ansible-galaxy install geerlingguy.swap
-      when: colcon_use_swap|bool
-
 - name: build ros from source
   hosts: '{{ nodes }}'
   vars:
     ros2_user:
       name: '{{ ansible_user }}'
       group: '{{ ansible_user }}'
-    ros2_workspace: '/home/{{ ros2_user.name }}/{{ ros2_distribution }}_ws/'
+    ros2_workspace: '/home/{{ ros2_user.name }}/{{ ros2_distribution }}_ws'   # no trailling slash
 
   tasks:
 
@@ -58,10 +50,6 @@
   # avoid symlink for cloning binaries
   - name: set some colcon default flags
     include: tasks/ros2-colcon-set-defaults.yml
-    vars:
-      ros2_colcon_symlink: true
-      ros2_colcon_needs_latomic: false
-
 
   # # finally build the workspace
   #- name: ROS2 colcon | build the workspace

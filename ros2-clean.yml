@@ -4,8 +4,7 @@
     ros2_user:
       name: '{{ ansible_user }}'
       group: '{{ ansible_user }}'
-    ros2_workspace: '/home/{{ ros2_user.name }}/{{ ros2_distribution }}_ws/'
-
+    ros2_workspace: '/home/{{ ros2_user.name }}/{{ ros2_distribution }}_ws'
 
 
   tasks:
@@ -33,11 +32,11 @@
 
   - name: ROS2 remove existing build files
     include: tasks/ros2-clean-workspace.yml
-    when: (fullclean|bool)
+    when: ((fullclean|default(false))|bool)
 
   - name: ROS2 remove sources
     include: tasks/ros2-erase-workspace.yml
-    when: (remove_sources|bool) and (ws_dirs is defined)
+    when: ((remove_sources|default(false))|bool) and (ws_dirs is defined)
 
 
 

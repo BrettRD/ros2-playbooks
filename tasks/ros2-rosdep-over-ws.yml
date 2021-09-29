@@ -5,18 +5,20 @@
 #     which is not available in the normal repos.
 #     this is what we need the OSRF repos for.
 
+
+
 # update rosdep package lists
 - name: rosdep update package lists
   command: rosdep update
+  become: yes   # throws warnings but works.
   args:
     chdir: '{{ ros2_workspace }}'
 
-# use rosdep to download package dependencies
+  # use rosdep to download package dependencies
 - name: rosdep install system dependencies
-  command: rosdep install --from-paths src/ --ignore-src -r -y
-  become: yes
+  shell: rosdep install --from-paths src --ignore-src --rosdistro={{ ros2_distribution }} -r -y
+  become: yes   # throws warnings but works.
   args:
     chdir: '{{ ros2_workspace }}'
-
 
 

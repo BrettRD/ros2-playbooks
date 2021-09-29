@@ -5,6 +5,8 @@
   ansible.builtin.git:
     repo: '{{ git_package.repo }}'
     dest: '{{ ros2_workspace }}/src/{{ target_ws_dir }}/{{ git_package.dest }}'
+    # XXX version? branch?
   loop: '{{ repo_list }}'
   loop_control:
     loop_var: git_package
+

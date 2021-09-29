@@ -1,0 +1,54 @@
+---
+
+
+  # returns .rc == 0 for swap in use
+  # returns .rc == 1 for swap not in use
+  # returns {{ swap_file_path }}\t{{ swap_size_in_bytes }} in stdout
+
+- name:  ROS2 swap enable | test if swap is mounted
+  shell: "swapon --show=name,size --bytes | grep {{ swap_file_path }}"
+  register: swap_file_mounted
+  failed_when: swap_file_mounted.rc == 2
+
+# XXX consider collecting the size of the swap file
+
+
+- name: ROS2 Colcon | disable old swap space
+  include: ros2-colcon-extra-swap-disable.yml
+  when: swap_file_mounted.rc == 0
+
+- name:  ROS2 swap enable | test if swap is still mounted
+  shell: "swapon --show=name,size --bytes | grep {{ swap_file_path }}"
+  register: swap_file_mounted
+  failed_when: swap_file_mounted.rc == 2
+
+
+
+- name: ROS2 swap enable | add swap space for build
+  block:
+  - name: ROS2 swap enable | create swap file
+    command: >
+      dd if=/dev/zero of={{ swap_file_path }} bs=1MiB count={{ swap_file_size_mib }}
+    #creates: '{{ swap_file_path }}'  always erase
+    become: yes # this file might remain with root permissions after the last run
+
+  - name: ROS2 swap enable | Set swap file permissions
+    file:
+      path: "{{ swap_file_path }}"
+      owner: root
+      group: root
+      mode: 0600
+    become: yes
+
+  - name: ROS2 swap enable | Make swap filesystem
+    command: mkswap {{ swap_file_path }}
+    become: yes
+
+  - name: ROS2 swap enable | Mount the swapfile
+    command: swapon {{ swap_file_path }}
+    become: yes
+
+  when: swap_file_mounted.rc == 1
+
+
+

@@ -1,35 +1,32 @@
 ---
 # build with colcon using defaults set previously
 
+
 # my sympathies to your SD card
 - name: ROS2 Colcon | add swap space for build
-  include_role:
-    name: geerlingguy.swap
-    tasks_from: enable
-    apply:
-      become: yes
+  include: ros2-colcon-extra-swap-enable.yml
   vars:
-    #swap_swappiness: 2  # avoid using this swapfile where possible
-    #swap_swappiness: 60  # The swap role used set system-wide swappiness and does not un-set it on swapoff
     swap_file_path: '{{ ros2_workspace }}/colcon_swapfile'
-    swap_file_size_mb: '4096'
-  when: colcon_use_swap|bool
+    swap_file_size_mib: '4096'
+  when: (ros2_colcon_use_swap|default(false))|bool
+
+# XXX take a variable for the sub directory to rebuild
+
+- name: ROS2 Colcon | build
+  shell: >
+    {% if ros2_colcon_single_core|default(false) %}
+    MAKEFLAGS="-j1"
+    {% endif %}
+    colcon build
+    {% if ros2_colcon_skip_packages_to is defined %}
+    --packages-skip-up-to {{ ros2_colcon_skip_packages_to }}
+    {% endif %}
+  args:
+    chdir: '{{ ros2_workspace }}'
 
 
-- name:
-  block:
-    - name: ROS2 Colcon | build
-      command: colcon build 
-      args:
-        chdir: '{{ ros2_workspace }}'
-
-  always:
-    - name: ROS2 Colcon | remove swap space
-      include_role:
-        name: geerlingguy.swap
-        tasks_from: disable
-        apply:
-          become: yes
-      vars:
-        swap_file_path: '{{ ros2_workspace }}/colcon_swapfile'
-      when: colcon_use_swap|bool
+- name: ROS2 Colcon | remove swap space
+  include: ros2-colcon-extra-swap-disable.yml
+  vars:
+    swap_file_path: '{{ ros2_workspace }}/colcon_swapfile'
+  when: (ros2_colcon_use_swap|default(false))|bool

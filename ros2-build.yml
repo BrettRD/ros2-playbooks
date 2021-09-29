@@ -1,11 +1,17 @@
 ---
 
-- name: install role 'swap' from geerlingguy
-  hosts: localhost
-  tasks:
-    - name: Get geerlingguy.swap
-      command: ansible-galaxy install geerlingguy.swap
-      when: colcon_use_swap|bool
+# On 32b platforms (raspberry pi 0-2 ), you need to build everything, including ros_core.
+# once ros_core is built, you don't need to wait for everything to validate, you can skip roscore 
+# pass the packages that don't need rebuilding as a space seaprated string to `colcon_skip_packages_to`
+# example:
+#    colcon_skip_packages_to='ros_core joy'
+#
+# full example command:
+#    ansible-playbook ros2-colcon-rebuild.yml --extra-vars "nodes=navbeacons ros2_colcon_single_core=true colcon_skip_packages_to='ros_core joy'" -K -v
+# 
+
+
+
 
 - name: build ros from source
   hosts: '{{ nodes }}'
@@ -13,7 +19,7 @@
     ros2_user:
       name: '{{ ansible_user }}'
       group: '{{ ansible_user }}'
-    ros2_workspace: '/home/{{ ros2_user.name }}/{{ ros2_distribution }}_ws/'
+    ros2_workspace: '/home/{{ ros2_user.name }}/{{ ros2_distribution }}_ws'
 
   tasks:
 
@@ -35,6 +41,8 @@
 
 
   ############## start changing the target #################
+
+  # XXX take a variable for the sub directory to rebuild
 
 
   # set some sane defaults for prototyping with colcon

@@ -14,14 +14,14 @@
     content: |
       {
         "build": {
-      {% if ros2_colcon_symlink %}
+      {% if ros2_colcon_symlink|default(true) %}
           "symlink-install": true,
       {% endif %}
-      {% if ros2_colcon_single_core %}
+      {% if ros2_colcon_single_core|default(false) %}
           "parallel-workers": 1,
           "make-flags" :"-j1",
       {% endif %}
-      {% if ros2_colcon_needs_latomic %}
+      {% if ros2_colcon_needs_latomic|default(false) %}
           "cmake-args":[ "-DCMAKE_SHARED_LINKER_FLAGS='-latomic'","-DCMAKE_EXE_LINKER_FLAGS='-latomic'" ],
       {% endif %}
         }

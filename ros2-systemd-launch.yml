@@ -30,6 +30,6 @@
 
   - name: ROS2 install a launch file as a systemd service
     include: tasks/ros2-systemd-from-launch.yml
-    when: ((remove|bool) and (launch_service_name is defined)) or (launch_service_name is defined and launchpackage is defined and launchfile is defined)
+    when: (((remove|default(false))|bool) and (launch_service_name is defined)) or (launch_service_name is defined and launchpackage is defined and launchfile is defined)
 
 
