@@ -1,5 +1,9 @@
 ---
 
+# XXX offer launch dependency management using unit dependencies
+# After=<comma separated list of services>
+# BindsTo=<comma separated list of services>
+
 - name: ROS2 systemd service from launch | Create Unit file
   copy:
     dest: /usr/lib/systemd/system/ros2_{{ launch_service_name }}.service
@@ -26,24 +30,39 @@
   when: (remove is undefined or not remove|bool) and (launch_service_name is defined and launchpackage is defined and launchfile is defined)
 
 
-# # load the new systemd service, but don't start it
-# - name: ROS2 systemd service from launch | Insert Unit file
-#   ansible.builtin.systemd:
-#     name: ros2_{{ launch_service_name }}.service
-#     #state: {{ remove == false && launch_immediately == true }} # running
-#     #enabled: {{  remove == false && launch_on_boot }} # yes
-#     state: stopped
-#     enabled: no
-#     daemon_reload: yes
-#   become: yes
+
+# load the new systemd service, start it, and set it to start at boot
+- name: ROS2 systemd service from launch | Insert Unit file
+  ansible.builtin.systemd:
+    name: ros2_{{ launch_service_name }}.service
+    #state: {{ remove == false && launch_immediately == true }} # running
+    #enabled: {{  remove == false && launch_on_boot }} # yes
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  become: yes
+  when: (remove is undefined or not remove|bool) and (launch_service_name is defined and launchpackage is defined and launchfile is defined)
 
 
+
+# load the new systemd service, but don't start it
+- name: ROS2 systemd service from launch | Disable Unit file
+  ansible.builtin.systemd:
+    name: ros2_{{ launch_service_name }}.service
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+  become: yes
+  when: ((remove|default(false))|bool) and (launch_service_name is defined)
+
+
+
+# remove the service file
 - name: ROS2 systemd service from launch | Remove launch service
   ansible.builtin.file:
     dest: /usr/lib/systemd/system/ros2_{{ launch_service_name }}.service
     state: absent
   become: yes
-  when: (remove|bool) and (launch_service_name is defined)
-
+  when: ((remove|default(false))|bool) and (launch_service_name is defined)
 
 

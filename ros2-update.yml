@@ -1,0 +1,45 @@
+---
+- name: build ros from source
+  hosts: '{{ nodes }}'
+  vars:
+    ros2_user:
+      name: '{{ ansible_user }}'
+      group: '{{ ansible_user }}'
+    ros2_workspace: '/home/{{ ros2_user.name }}/{{ ros2_distribution }}_ws'   # no trailling slash
+
+  tasks:
+
+  - name: lookup desired ros config
+    ansible.builtin.include_vars:
+      file: vars/ros-config.yml
+
+  - name: lookup desired workspace layout
+    ansible.builtin.include_vars:
+      file: vars/workspace-config.yml
+
+  - name: report the config back
+    ansible.builtin.debug:
+      msg: 
+        - 'Refreshing sources in ROS2 {{ ros2_distribution }}'
+        - 'for user: {{ ros2_user.name }}'
+        - 'into workspace at {{ ros2_workspace }}'
+        #- 'preloading directories with config {{ ros2_workspace_layout }}'
+
+
+  ############## start changing the target #################
+
+
+  # create and fill a workspace
+  - name: ROS2 Workspace Setup
+    include: tasks/ros2-workspace-setup.yml
+  # XXX allow single directory targets
+
+  # fetch package-specific system dependencies
+  - name: ROS2 install remaining packages with rosdep
+    include: tasks/ros2-rosdep-over-ws.yml
+
+
+  # # finally build the workspace
+  #- name: ROS2 colcon | build the workspace
+  #  include: tasks/ros2-colcon-build.yml
+

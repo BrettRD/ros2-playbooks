@@ -40,5 +40,6 @@ ros2_workspace_layout:
       - dest: ros-gst-bridge  # allow name override
         repo: 'https://github.com/BrettRD/ros-gst-bridge.git'
         # version: HEAD # XXX fiddle with conditionals
-
+      - dest: monitoring  # allow name override
+        repo: 'https://github.com/BrettRD/ros2_monitor.git'
   # XXX add support for vcs .repos files
